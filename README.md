@@ -6,9 +6,9 @@ Overriden tkinter widgets
 
 # Install
 
-    pip install customtkwidgets
+    pip install moustovtkwidgets
 
-* https://github.com/Moustov/mTk_widgets
+* https://github.com/Moustov/moustovtkwidgets
 
 # Features
 ## mtkEditTable

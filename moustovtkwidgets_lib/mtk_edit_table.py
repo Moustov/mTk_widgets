@@ -1,10 +1,11 @@
 from functools import partial
-from tkinter import Tk, Button
+from tkinter import Tk, Button, Scrollbar
 from tkinter.constants import *
 from tkinter.ttk import Treeview, Entry
 
 
 # see https://www.youtube.com/watch?v=n5gItcGgIkk
+# rowheight:https://stackoverflow.com/questions/26957845/ttk-treeview-cant-change-row-height/26962663#26962663
 
 class mtkEditTable(Treeview):
     """
@@ -13,10 +14,11 @@ class mtkEditTable(Treeview):
     * set self.debug to True for debugging
     * kwargs["columns"]: ex = ("A", "B", "C")
     * kwargs["column_titles"]: ex = ("col A", "col B", "col C")
-    * kwargs["cells"]: ex = [{"A": "ZER", "B": "TYU", "C": "IOP"},
-                            {"A": "QSD", "B": "FGH", "C": "JKL"}
-                            ]
+    * kwargs["cells"]: ex = {"0": ["ZER", "TYU", "IOP"],
+            "1": ["QSD", "FGH", "JKL"]
+            }
     """
+
     def __init__(self, master, **kwargs):
         self.debug = False
         self.columns = kwargs["columns"]
@@ -41,13 +43,22 @@ class mtkEditTable(Treeview):
                 self.heading(col_id, text=t, anchor=CENTER)
         # set data
         if self.cells:
-            index = 0
-            for row in self.cells:
-                values = []
-                for c in row:
-                    values.append(row[c])
-                self.insert(parent="", index='end', iid=str(index), text="", values=tuple(values))
-                index += 1
+            self.set_data(self.cells)
+        else:
+            self.clear_data()
+
+    def clear_data(self):
+        self.cells = None
+        for row in self.get_children():
+            self.delete(row)
+
+    def set_data(self, json=None):
+        self.clear_data()
+        if json is not None:
+            self.cells = json
+        for row in self.cells.keys():
+            self.insert(parent="", index='end', iid=row, text="", values=tuple(self.cells[row]))
+        Tk.update(self.master)
 
     def get_data(self) -> dict:
         """
@@ -77,6 +88,8 @@ class mtkEditTable(Treeview):
             col_number = int(col_index[1:]) - 1
             cell_value = values[col_number]
             cell_box = self.bbox(selected_row_iid, col_number)
+            if self.debug:
+                print("cell_box", cell_box)
             edit_entry = Entry(self.master, width=cell_box[2])
             # values recorded for _on_return_pressed
             edit_entry.editing_column_index = col_number
@@ -84,6 +97,7 @@ class mtkEditTable(Treeview):
             # only cells are editable / not the tree part
             if col_number > -1:
                 edit_entry.place(x=cell_box[0], y=cell_box[1], w=cell_box[2], h=cell_box[3])
+                print("winfo_rooty", self.winfo_rooty())
                 edit_entry.insert(0, cell_value)
                 edit_entry.select_range(0, END)
                 edit_entry.focus()
@@ -115,6 +129,7 @@ class mtkEditTable(Treeview):
         else:
             self.item(selected_row_iid, text=new_text)
         event.widget.destroy()
+        self.cells = self.get_data()
 
 
 def __do_test_extract(a_met: mtkEditTable):
@@ -132,9 +147,9 @@ if __name__ == "__main__":
     root = Tk()
     col_ids = ("A", "B", "C")
     col_titles = ("col A", "col B", "col C")
-    data = [{"A": "ZER", "B": "TYU", "C": "IOP"},
-            {"A": "QSD", "B": "FGH", "C": "JKL"}
-            ]
+    data = {"0": ["ZER", "TYU", "IOP"],
+            "1": ["QSD", "FGH", "JKL"]
+            }
     met = mtkEditTable(root, columns=col_ids, column_titles=col_titles, cells=data)
     met.debug = True
     met.pack(fill=BOTH, expand=True)
