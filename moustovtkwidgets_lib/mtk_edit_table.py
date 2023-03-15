@@ -20,6 +20,7 @@ class mtkEditTable(Treeview):
     """
 
     def __init__(self, master, **kwargs):
+        self.frame = master
         self.debug = False
         self.columns = kwargs["columns"]
         self.column_titles = None
@@ -34,6 +35,7 @@ class mtkEditTable(Treeview):
         #
         super().__init__(master, **kwargs)
         # events
+        print("<Double-1>")
         self.bind("<Double-1>", self._on_double_click)
         # set layout
         if self.column_titles:
@@ -77,9 +79,10 @@ class mtkEditTable(Treeview):
         :param event:
         :return:
         """
+        print("_on_double_click")
         region_clicked = self.identify_region(event.x, event.y)
         if self.debug:
-            print("region_clicked", region_clicked, event)
+            print("region double clicked", region_clicked, event)
         if region_clicked == "cell":
             col_index = self.identify_column(event.x)
             selected_row_iid = self.focus()
@@ -103,6 +106,7 @@ class mtkEditTable(Treeview):
                 edit_entry.focus()
                 edit_entry.bind("<FocusOut>", self._on_focus_out)
                 edit_entry.bind("<Return>", self._on_return_pressed)
+                edit_entry.bind("<Escape>", self._on_focus_out)
 
     def _on_focus_out(self, event):
         """
@@ -135,8 +139,8 @@ class mtkEditTable(Treeview):
 def __do_test_extract(a_met: mtkEditTable):
     """
     only for test purpose on met.get_data()
-    :param a_met: 
-    :return: 
+    :param a_met:
+    :return:
     """
     j = a_met.get_data()
     print(j)
