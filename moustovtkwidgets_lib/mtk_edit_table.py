@@ -15,7 +15,6 @@ class mtkEditTableListener:
         pass
 
 
-
 class mtkEditTable(Treeview):
     """
     Editable table based on a TreeView => all Treeview features can be used
@@ -121,8 +120,20 @@ class mtkEditTable(Treeview):
         self.clear_data()
         if json is not None:
             self.cells = json
-        for row in self.cells.keys():
-            self.insert(parent="", index='end', iid=row, text="", values=tuple(self.cells[row]))
+        for key in self.cells.keys():
+            print("-", key, "/", self.cells[key])
+            if type(self.cells[key]) is dict:
+                child_id = 0
+                for child_key in self.cells[key].keys():
+                    print("--", key, "/", child_key, "/", self.cells[key][child_key])
+                    if child_id == 0:
+                        parent = child_key
+                        self.insert(parent="", index='end', iid=child_key, text=key, values=tuple(self.cells[key][child_key]))
+                    else:
+                        self.insert(parent=parent, index='end', iid=child_key, text="", values=tuple(self.cells[key][child_key]))
+                    child_id += 1
+            else:
+                self.insert(parent="", index='end', iid=key, text="", values=tuple(self.cells[key]))
         Tk.update(self.master)
 
     def get_data(self) -> dict:
@@ -131,9 +142,18 @@ class mtkEditTable(Treeview):
         """
         res = {}
         for i in self.get_children():
-            data = self.item(i)['values']
-            row = []
-            res[i] = data
+            print("--", self.item(i))
+            text = self.item(i)['text']
+            if text:
+                res[text] = {}
+                res[text][i] = self.item(i)['values']
+                for j in self.get_children(i):
+                    print("----", self.item(j))
+                    res[text][j] = self.item(j)['values']
+            else:
+                data = self.item(i)['values']
+                res[i] = data
+        print(res)
         return res
 
     def get_cell_value(self, event):
