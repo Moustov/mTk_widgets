@@ -18,7 +18,8 @@ Editable TreeView
 * 16/MAR/23
   * editable tree cells
   * listener mechanism added to fire events from mtkEditTable
-  * package 0.4.x
+  * json serialization with parts from tree
+  * package 0.5.0
 * 15/MAR/23
   * horizontal scroller on double-click
   * right-click menu
