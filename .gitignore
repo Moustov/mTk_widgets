@@ -1,6 +1,5 @@
 /venv/
 /build/
-/mkTk_Widgets.egg-info/
 /dist/
 /.idea/
 /moustovtkwidgets.egg-info/
