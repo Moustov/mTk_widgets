@@ -17,7 +17,8 @@ Editable TreeView
 # Release Notes
 * 16/MAR/23
   * editable tree cells
-  * package 0.3.x
+  * listener mechanism added to fire events from mtkEditTable
+  * package 0.4.x
 * 15/MAR/23
   * horizontal scroller on double-click
   * right-click menu

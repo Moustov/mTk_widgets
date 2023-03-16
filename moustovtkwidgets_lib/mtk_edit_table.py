@@ -7,6 +7,15 @@ from tkinter.ttk import Treeview, Entry, Frame
 # see https://www.youtube.com/watch?v=n5gItcGgIkk
 # rowheight:https://stackoverflow.com/questions/26957845/ttk-treeview-cant-change-row-height/26962663#26962663
 
+class mtkEditTableListener:
+    def right_click_fired(self, event):
+        pass
+
+    def double_click_fired(self, event):
+        pass
+
+
+
 class mtkEditTable(Treeview):
     """
     Editable table based on a TreeView => all Treeview features can be used
@@ -25,7 +34,7 @@ class mtkEditTable(Treeview):
         self.edit_frame = None
         self.horscrlbar = None
         self.edit_entry = None
-
+        self.listeners = []
         self.columns = kwargs["columns"]
         self.column_titles = None
         self.cells = None
@@ -40,10 +49,6 @@ class mtkEditTable(Treeview):
             del kwargs["cells"]
         #
         super().__init__(master, **kwargs)
-        # events
-        print("<Double-1>")
-        self.bind("<Double-1>", self._on_double_click)
-        self.bind("<Button-3>", self._on_right_click)
         # set layout
         if self.column_titles:
             self.column("#0", width=0, stretch=NO)
@@ -55,7 +60,10 @@ class mtkEditTable(Treeview):
             self.set_data(self.cells)
         else:
             self.clear_data()
-        # https://tkdocs.com/tutorial/menus.html
+        # events
+        self.bind("<Double-1>", self._on_double_click)
+        self.bind("<Button-3>", self._on_right_click)
+        # right click menu - https://tkdocs.com/tutorial/menus.html
         self.menu = Menu(self.frame, tearoff=0)
         self.menu.add_command(label="Copy under", command=self.clone_after_current_row)
         self.menu.add_command(label="New empty line under", command=self.new_after_current_row)
@@ -63,8 +71,19 @@ class mtkEditTable(Treeview):
         self.menu.add_command(label="Remove current", command=self.remove_current)
         # text & image : menu.add_command(label=txt, image=self._img4, compound='left', command=cmd)
 
+    def add_listener(self, listener: mtkEditTableListener):
+        found = False
+        for l in self.listeners:
+            if l == listener:
+                found = True
+        if not found:
+            self.listeners.append(listener)
+
     def _on_right_click(self, event):
         self.rowID = self.identify('item', event.x, event.y)
+        for listener in self.listeners:
+            listener.right_click_fired(event)
+
         if self.rowID:
             self.selection_set(self.rowID)
             self.focus_set()
@@ -142,6 +161,9 @@ class mtkEditTable(Treeview):
         :return:
         """
         print("_on_double_click")
+        for listener in self.listeners:
+            listener.double_click_fired(event)
+
         region_clicked = self.identify_region(event.x, event.y)
         if self.debug:
             print("region double clicked", region_clicked, event)
