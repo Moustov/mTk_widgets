@@ -33,3 +33,6 @@ Editable TreeView
 
 # Additional links
 * Royalty free icons: https://www.vectorstock.com/royalty-free-vector/25-multimedia-blue-icon-pack-vector-45138316
+* Tkinter events: 
+  * Event types: https://web.archive.org/web/20190512164300id_/http://infohost.nmt.edu/tcc/help/pubs/tkinter/web/event-types.html 
+  * keysyms - keysyms recognized by Tk: https://www.tcl.tk/man/tcl8.4/TkCmd/keysyms.html
