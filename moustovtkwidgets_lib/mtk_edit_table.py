@@ -117,6 +117,9 @@ class mtkEditTable(Treeview):
             self.delete(row)
 
     def set_data(self, json=None):
+        """
+        fills the mkEditTable content with json
+        """
         self.clear_data()
         if json is not None:
             self.cells = json
@@ -137,6 +140,7 @@ class mtkEditTable(Treeview):
                     child_id += 1
             else:
                 # forces empty content on missing json fields
+                # todo make it DRY (code duplicated from children nodes)
                 values = self.cells[key]
                 len_missing_values = len(self.column_titles) - len(values)
                 for i in range(0, len_missing_values):
@@ -163,6 +167,9 @@ class mtkEditTable(Treeview):
         return res
 
     def get_cell_value(self, event):
+        """
+        get a cell value from an event
+        """
         col_index = self.identify_column(event.x)
         selected_row_iid = self.focus()
         selected_values = self.item(selected_row_iid)
@@ -171,6 +178,9 @@ class mtkEditTable(Treeview):
         return values[col_number]
 
     def get_cell_dimensions(self, event) -> ():
+        """
+        get a cell dimensions from an event
+        """
         col_index = self.identify_column(event.x)
         print("col_index", col_index)
         selected_row_iid = self.focus()
