@@ -121,19 +121,27 @@ class mtkEditTable(Treeview):
         if json is not None:
             self.cells = json
         for key in self.cells.keys():
-            print("-", key, "/", self.cells[key])
             if type(self.cells[key]) is dict:
                 child_id = 0
                 for child_key in self.cells[key].keys():
-                    print("--", key, "/", child_key, "/", self.cells[key][child_key])
+                    values = self.cells[key][child_key]
+                    # forces empty content on missing json fields
+                    len_missing_values =  len(self.column_titles) - len(values)
+                    for i in range (0, len_missing_values):
+                        values.append("")
                     if child_id == 0:
                         parent = child_key
-                        self.insert(parent="", index='end', iid=child_key, text=key, values=tuple(self.cells[key][child_key]))
+                        self.insert(parent="", index='end', iid=child_key, text=key, values=tuple(values))
                     else:
-                        self.insert(parent=parent, index='end', iid=child_key, text="", values=tuple(self.cells[key][child_key]))
+                        self.insert(parent=parent, index='end', iid=child_key, text="", values=tuple(values))
                     child_id += 1
             else:
-                self.insert(parent="", index='end', iid=key, text="", values=tuple(self.cells[key]))
+                # forces empty content on missing json fields
+                values = self.cells[key]
+                len_missing_values = len(self.column_titles) - len(values)
+                for i in range(0, len_missing_values):
+                    values.append("")
+                self.insert(parent="", index='end', iid=key, text="", values=tuple(values))
         Tk.update(self.master)
 
     def get_data(self) -> dict:
@@ -142,13 +150,11 @@ class mtkEditTable(Treeview):
         """
         res = {}
         for i in self.get_children():
-            print("--", self.item(i))
             text = self.item(i)['text']
             if text:
                 res[text] = {}
                 res[text][i] = self.item(i)['values']
                 for j in self.get_children(i):
-                    print("----", self.item(j))
                     res[text][j] = self.item(j)['values']
             else:
                 data = self.item(i)['values']
@@ -191,7 +197,7 @@ class mtkEditTable(Treeview):
         selected_row_iid = self.focus()
         selected_values = self.item(selected_row_iid)
         cell_box = self.get_cell_dimensions(event)
-        print("cell_box", cell_box)
+        # print("cell_box", cell_box)
         col_number = 0
         if region_clicked == "cell":
             values = selected_values.get("values")
@@ -205,7 +211,8 @@ class mtkEditTable(Treeview):
             if self.debug:
                 print("tree_value", cell_value)
         else:
-            print("Header clicked")
+            if self.debug:
+                print("Header clicked")
         #
         self.edit_frame = Frame(self.master)
         self.edit_entry = Entry(self.edit_frame, width=cell_box[2])

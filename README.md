@@ -15,6 +15,9 @@ Overriden tkinter widgets
 Editable TreeView
 
 # Release Notes
+* 18/MAR/23
+  * fix on missing exported data (empty cols)
+  * package 0.5.1
 * 16/MAR/23
   * editable tree cells
   * listener mechanism added to fire events from mtkEditTable
