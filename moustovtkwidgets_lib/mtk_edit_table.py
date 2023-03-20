@@ -116,13 +116,13 @@ class mtkEditTable(Treeview):
         for row in self.get_children():
             self.delete(row)
 
-    def set_data(self, json=None):
+    def set_data(self, json):
         """
         fills the mkEditTable content with json
+        :json: - eg. {'0': ['ZER', 'TYU', 'IOP'], '1': ['QSD', 'FGH', 'JKL']}
         """
         self.clear_data()
-        if json is not None:
-            self.cells = json
+        self.cells = json
         for key in self.cells.keys():
             if type(self.cells[key]) is dict:
                 child_id = 0
@@ -150,7 +150,8 @@ class mtkEditTable(Treeview):
 
     def get_data(self) -> dict:
         """
-        :return: a dict from the content
+        :return: a dict from the content  - eg. {'0': ['ZER', 'TYU', 'IOP'], '1': ['QSD', 'FGH', 'JKL']}
+
         """
         res = {}
         for i in self.get_children():
@@ -180,6 +181,7 @@ class mtkEditTable(Treeview):
     def get_cell_dimensions(self, event) -> ():
         """
         get a cell dimensions from an event
+        res[0]: x, res[1]: y, res[2]: width, res[3]: height
         """
         col_index = self.identify_column(event.x)
         print("col_index", col_index)
