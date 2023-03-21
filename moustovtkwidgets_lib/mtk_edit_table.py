@@ -1,3 +1,4 @@
+import traceback
 from functools import partial
 from tkinter import Tk, Button, Scrollbar, Menu
 from tkinter.constants import *
@@ -37,7 +38,7 @@ class mtkEditTable(Treeview):
         self.columns = kwargs["columns"]
         self.column_titles = None
         self.cells = None
-        self.rowID = None
+        self.rowID = 0
         self.current_cell_value = None
         # handling extra params
         if "column_titles" in kwargs.keys():
@@ -62,6 +63,7 @@ class mtkEditTable(Treeview):
         # events
         self.bind("<Double-1>", self._on_double_click)
         self.bind("<Button-3>", self._on_right_click)
+        self.bind("<Button-1>", self._on_click)
         # right click menu - https://tkdocs.com/tutorial/menus.html
         self.menu = Menu(self.frame, tearoff=0)
         self.menu.add_command(label="Copy under", command=self.clone_after_current_row)
@@ -69,6 +71,11 @@ class mtkEditTable(Treeview):
         self.menu.add_separator()
         self.menu.add_command(label="Remove current", command=self.remove_current)
         # text & image : menu.add_command(label=txt, image=self._img4, compound='left', command=cmd)
+
+    def _on_click(self, event):
+        self.rowID = self.identify('item', event.x, event.y)
+        self.selection_set(self.rowID)
+        print("mktEditTable selected", self.rowID)
 
     def add_listener(self, listener: mtkEditTableListener):
         found = False
@@ -123,29 +130,34 @@ class mtkEditTable(Treeview):
         """
         self.clear_data()
         self.cells = json
-        for key in self.cells.keys():
-            if type(self.cells[key]) is dict:
+        print("mktet set_data", json)
+        row_index = 0
+        for line_key in self.cells.keys():
+            if type(self.cells[line_key]) is dict:
                 child_id = 0
-                for child_key in self.cells[key].keys():
-                    values = self.cells[key][child_key]
+                for child_key in self.cells[line_key].keys():
+                    values = self.cells[line_key][child_key]
                     # forces empty content on missing json fields
                     len_missing_values =  len(self.column_titles) - len(values)
                     for i in range (0, len_missing_values):
                         values.append("")
+                    print("mktet set_data --", line_key, child_key, values)
                     if child_id == 0:
                         parent = child_key
-                        self.insert(parent="", index='end', iid=child_key, text=key, values=tuple(values))
+                        self.insert(parent="", index='end', iid=child_key, text=line_key, values=tuple(values))
                     else:
                         self.insert(parent=parent, index='end', iid=child_key, text="", values=tuple(values))
                     child_id += 1
             else:
                 # forces empty content on missing json fields
                 # todo make it DRY (code duplicated from children nodes)
-                values = self.cells[key]
+                values = self.cells[line_key]
                 len_missing_values = len(self.column_titles) - len(values)
                 for i in range(0, len_missing_values):
                     values.append("")
-                self.insert(parent="", index='end', iid=key, text="", values=tuple(values))
+                print("mktet set_data -", line_key, values)
+                self.insert(parent="", index='end', iid=line_key, text="", values=tuple(values))
+            row_index += 1
         Tk.update(self.master)
 
     def get_data(self) -> dict:
