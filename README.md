@@ -15,6 +15,9 @@ Overriden tkinter widgets
 Editable TreeView
 
 # Release Notes
+* 21/MAR/23
+  * selecting a line will keep self.rowID updated
+  * package 0.5.2
 * 18/MAR/23
   * fix on missing exported data (empty cols)
   * package 0.5.1
